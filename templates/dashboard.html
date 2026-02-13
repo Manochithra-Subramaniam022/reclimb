@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Dashboard</h1>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Manage lost and found items on campus</p>
+
+            <form action="{{ url_for('dashboard') }}" method="GET"
+                style="display: flex; gap: 0.5rem; max-width: 500px;">
+                <input type="hidden" name="section" value="{{ section }}">
+                <div style="position: relative; flex: 1;">
+                    <i class="ph ph-magnifying-glass"
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="q" value="{{ query or '' }}" placeholder="Search items..."
+                        style="padding-left: 2.5rem; width: 100%;">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if query %}
+                <a href="{{ url_for('dashboard', section=section) }}" class="btn btn-outline" title="Clear Search">
+                    <i class="ph ph-x"></i>
+                </a>
+                {% endif %}
+            </form>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{{ url_for('add_item', status='lost') }}" class="btn btn-outline">
+                <i class="ph ph-magnifying-glass"></i> I Lost Something
+            </a>
+            <a href="{{ url_for('add_item', status='found') }}" class="btn btn-primary">
+                <i class="ph ph-hand-heart"></i> I Found Something
+            </a>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <a href="{{ url_for('dashboard', section='active') }}"
+            class="tab {% if section != 'previous' %}active{% endif %}">
+            Active Items
+        </a>
+        <a href="{{ url_for('dashboard', section='previous') }}"
+            class="tab {% if section == 'previous' %}active{% endif %}">
+            Previous Items
+        </a>
+    </div>
+
+    {% if items %}
+    <div class="grid">
+        {% for item in items %}
+        <a href="{{ url_for('view_item', item_id=item.id) }}" class="card">
+            <span class="card-badge badge-{{ item.status|lower }}">
+                {{ item.status }}
+            </span>
+            <h3 class="card-title">{{ item.item_name }}</h3>
+            <div class="card-meta">
+                <div class="meta-item">
+                    <i class="ph ph-map-pin"></i> {{ item.location }}
+                </div>
+                <div class="meta-item">
+                    <i class="ph ph-calendar-blank"></i> {{ item.date }}
+                </div>
+            </div>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">
+                    View Details <i class="ph ph-arrow-right"></i>
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div
+        style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius); border: 1.5px dashed var(--border);">
+        <i class="ph ph-stack" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+        <h3 style="color: var(--text-muted);">No items found in this section</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+            Try switching tabs or report a new item to get started.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

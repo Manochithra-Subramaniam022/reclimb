@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reclaim – College Lost & Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Phosphor Icons for a clean look -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+    <nav>
+        <a href="{{ url_for('dashboard') }}" class="brand">RECLAIM</a>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ url_for('requests_inbox') }}" class="nav-link">Requests</a>
+            <a href="{{ url_for('add_item', status='lost') }}" class="btn btn-outline btn-sm"
+                style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                <i class="ph ph-plus-circle"></i> Add Lost
+            </a>
+            <a href="{{ url_for('add_item', status='found') }}" class="btn btn-primary btn-sm"
+                style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                <i class="ph ph-plus-circle"></i> Add Found
+            </a>
+
+            {% if session.get('user_id') %}
+            <div class="profile-dropdown">
+                <div class="profile-trigger">
+                    <i class="ph ph-user-circle" style="font-size: 1.4rem;"></i>
+                    <i class="ph ph-caret-down" style="font-size: 0.8rem;"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-header">
+                        <span class="dropdown-name">{{ session.get('user_name') }}</span>
+                        <span class="dropdown-email">{{ session.get('user_email', '@cit.edu.in') }}</span>
+                    </div>
+                    <a href="#" class="dropdown-item"><i class="ph ph-gear"></i> Settings</a>
+                    <a href="{{ url_for('logout') }}" class="dropdown-item" style="color: var(--danger);">
+                        <i class="ph ph-sign-out"></i> Logout
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="container" style="margin-bottom: 0;">
+        {% for message in messages %}
+        <div
+            style="background: #dbeafe; color: #1e40af; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 500;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+        &copy; 2026 Reclaim – Secure Campus Lost & Found
+    </footer>
+
+    <script>
+        // Simple active link handler
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html>

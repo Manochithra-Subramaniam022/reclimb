@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h1 style="text-align: center; margin-bottom: 0.5rem;">Welcome Back</h1>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Log in with your college email</p>
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="form-group">
+                <label for="email">College Email</label>
+                <input type="email" id="email" name="email" placeholder="username@cit.edu.in" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; justify-content: center; margin-top: 1rem;">
+                Log In
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+            Don't have an account? <a href="{{ url_for('register') }}"
+                style="color: var(--primary); font-weight: 600;">Sign up</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

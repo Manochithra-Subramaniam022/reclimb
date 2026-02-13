@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+  <div style="margin-bottom: 2rem;">
+    <a href="{{ url_for('dashboard') }}"
+      style="color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="ph ph-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <div class="card" style="padding: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+      <div>
+        <span class="card-badge badge-{{ item.status|lower }}">{{ item.status }}</span>
+        <h1 style="font-size: 2.25rem; margin-top: 0.5rem;">{{ item.item_name }}</h1>
+        <p class="item-date" style="color: var(--text-muted); font-size: 0.9rem;">Listed on {{ item.date }}</p>
+      </div>
+      {% if session.user_id == item.owner_id and item.is_returned == 0 %}
+      <form action="{{ url_for('mark_returned', item_id=item.id) }}" method="POST">
+        <button type="submit" class="btn btn-primary"
+          onclick="return confirm('Are you sure? This will archive the item and make chats read-only.')">
+          <i class="ph ph-check-circle"></i> Mark as Returned
+        </button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+      <div class="card-meta">
+        <label style="color: var(--text-muted); margin-bottom: 0.25rem;">Location</label>
+        <div style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="ph ph-map-pin" style="color: var(--primary);"></i> {{ item.location }}
+        </div>
+      </div>
+      <div class="card-meta">
+        <label style="color: var(--text-muted); margin-bottom: 0.25rem;">Date Spotted/Lost</label>
+        <div style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="ph ph-calendar-blank" style="color: var(--primary);"></i> {{ item.date }}
+        </div>
+      </div>
+    </div>
+
+    <div
+      style="padding: 2rem; background: var(--bg-main); border-radius: var(--radius); border: 1px solid var(--border);">
+      {% if show_full %}
+      <div style="margin-bottom: 2rem;">
+        <label>Description</label>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">{{ item.description }}</p>
+      </div>
+
+      {% if item.image_path %}
+      <div style="margin-bottom: 2rem;">
+        <label>Reference Image</label>
+        <img src="{{ url_for('uploads', filename=item.image_path) }}" alt="Item image"
+          style="width: 100%; border-radius: var(--radius); margin-top: 0.5rem; border: 1px solid var(--border);">
+      </div>
+      {% endif %}
+
+      <div>
+        <label>Contact Info</label>
+        <p style="margin-top: 0.5rem; font-weight: 600;">{{ item.contact }}</p>
+      </div>
+
+      {% if request_obj and request_obj.status == "accepted" and item.is_returned == 0 %}
+      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center;">
+        <a href="{{ url_for('chat', req_id=request_obj.id) }}" class="btn btn-primary"
+          style="width: 100%; justify-content: center;">
+          <i class="ph ph-chats"></i> Open Chat
+        </a>
+      </div>
+      {% endif %}
+      {% else %}
+      <div style="text-align: center; padding: 1rem;">
+        <i class="ph ph-lock-key" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 0.5rem;">Details Locked</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+          For security reasons, images and descriptions are hidden. <br>
+          Please send a claim request to the owner to reveal full details and start a chat.
+        </p>
+
+        {% if not request_obj %}
+        {% if session.user_id != item.owner_id %}
+        <button onclick="document.getElementById('claim-form').style.display='block'; this.style.display='none'"
+          class="btn btn-primary">
+          Send Claim Request
+        </button>
+
+        <div id="claim-form"
+          style="display: none; text-align: left; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+          <form action="{{ url_for('request_item', item_id=item.id) }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="claim_message">Message to Owner</label>
+              <textarea name="claim_message" id="claim_message" rows="3"
+                placeholder="Explain why this item belongs to you..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="image">Proof Image (Optional)</label>
+              <input type="file" name="image" id="image">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+              Submit Request
+            </button>
+          </form>
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted); font-weight: 600;">Watching your own item.</p>
+        {% endif %}
+        {% else %}
+        <div
+          style="display: inline-block; padding: 0.5rem 1rem; background: #fef3c7; color: #92400e; border-radius: 50px; font-weight: 600; font-size: 0.9rem;">
+          <i class="ph ph-clock"></i> Request Status: {{ request_obj.status|capitalize }}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

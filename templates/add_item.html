@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+  <div style="margin-bottom: 2rem;">
+    <a href="{{ url_for('dashboard') }}"
+      style="color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="ph ph-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <div class="card" style="padding: 2.5rem;">
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <span class="card-badge badge-{{ status|lower }}" style="margin-bottom: 0.5rem; display: inline-block;">
+        Report {{ status|capitalize }} Item
+      </span>
+      <h1 style="font-size: 2rem; margin-top: 0.5rem;">Item Details</h1>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Provide accurate information to help with recovery.</p>
+    </div>
+
+    <form action="{{ url_for('add_item', status=status) }}" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="item_name">Item Name</label>
+        <input type="text" id="item_name" name="item_name" placeholder="e.g. Blue Dell Laptop Charger" required>
+      </div>
+
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location" placeholder="e.g. Block 3 Canteen" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="date">Date</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Detailed Description</label>
+        <textarea id="description" name="description" rows="4"
+          placeholder="Mention specific marks, stickers, or features that help verify the item." required
+          style="width: 100%; resize: vertical;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="contact">Your Contact Info</label>
+        <input type="text" id="contact" name="contact" placeholder="Email or Phone number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="image">
+          Item Image
+          {% if status == 'found' %}
+          <span style="color: var(--danger); font-size: 0.75rem;">(Required for proof)</span>
+          {% else %}
+          <span style="color: var(--text-muted); font-size: 0.75rem;">(Optional)</span>
+          {% endif %}
+        </label>
+        <div
+          style="padding: 1.5rem; border: 2px dashed var(--border); border-radius: 8px; text-align: center; position: relative; background: var(--bg-main);">
+          <i class="ph ph-upload-simple"
+            style="font-size: 2rem; color: var(--secondary); display: block; margin-bottom: 0.5rem;"></i>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Click to upload or drag image here</span>
+          <input type="file" id="image" name="image" {% if status=='found' %}required{% endif %}
+            style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary"
+        style="width: 100%; justify-content: center; margin-top: 1rem; padding: 1rem;">
+        <i class="ph ph-paper-plane-tilt"></i> Post {{ status|capitalize }} Item
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

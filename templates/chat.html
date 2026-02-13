@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+    <a href="{{ url_for('requests_inbox') }}"
+      style="color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="ph ph-arrow-left"></i> Back to Inbox
+    </a>
+    <a href="{{ url_for('view_item', item_id=item_id) }}"
+      style="font-weight: 600; color: var(--primary); font-size: 0.9rem;">
+      View Item Details <i class="ph ph-arrow-square-out"></i>
+    </a>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div>
+        <h3 style="font-size: 1.25rem;">Communication Channel</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Secure & Private Discussion</p>
+      </div>
+      {% if is_returned %}
+      <span class="card-badge"
+        style="background: #fee2e2; color: #dc2626; border: none; font-size: 0.7rem; font-weight: 800;">ARCHIVED</span>
+      {% else %}
+      <span class="card-badge"
+        style="background: #dcfce7; color: #16a34a; border: none; font-size: 0.7rem; font-weight: 800;">ACTIVE</span>
+      {% endif %}
+    </div>
+
+    <div class="messages" id="message-container">
+      {% if messages %}
+      {% for msg in messages %}
+      <div class="message {% if msg.name == session.user_name %}message-sent{% else %}message-received{% endif %}">
+        <div
+          style="font-size: 0.7rem; font-weight: 800; margin-bottom: 0.4rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">
+          {{ msg.name }}
+        </div>
+        <div style="line-height: 1.5;">{{ msg.message }}</div>
+        <div class="message-meta" style="font-size: 0.65rem; margin-top: 0.5rem; opacity: 0.7;">{{ msg.timestamp }}
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div style="text-align: center; color: var(--text-muted); margin-top: 5rem; padding: 2rem;">
+        <i class="ph ph-chat-circle-dots"
+          style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.2; display: block;"></i>
+        <p style="font-size: 1.1rem; font-weight: 500;">No messages yet.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Coordinate a safe handover on campus.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="chat-footer">
+      {% if not is_returned %}
+      <form action="{{ url_for('send_message', req_id=req_id) }}" method="POST" class="chat-input-row">
+        <input type="text" name="message" placeholder="Write a message..." required autocomplete="off"
+          style="flex: 1; border-radius: 50px; padding-left: 1.5rem;">
+        <button type="submit" class="btn btn-primary"
+          style="border-radius: 50px; width: 45px; height: 45px; padding: 0; justify-content: center;">
+          <i class="ph ph-paper-plane-right" style="font-size: 1.25rem;"></i>
+        </button>
+      </form>
+      {% else %}
+      <div
+        style="text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 0.5rem; background: var(--bg-main); border-radius: 50px;">
+        <i class="ph ph-lock"></i> Chat is locked as the item has been returned.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  window.onload = function () {
+    const container = document.getElementById('message-container');
+    container.scrollTop = container.scrollHeight;
+  };
+</script>
+{% endblock %}
